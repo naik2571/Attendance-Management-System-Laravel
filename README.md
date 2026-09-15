@@ -46,8 +46,8 @@ A comprehensive, automated attendance tracking web application built with the **
    npm run build
 
 4.**Environment Setup:**
-  * **Copy the .env.example file and rename it to .env.
-  * **Open the .env file and update your database credentials (DB_DATABASE, DB_USERNAME, DB_PASSWORD).
+  * Copy the .env.example file and rename it to .env.
+  * Open the .env file and update your database credentials (DB_DATABASE, DB_USERNAME, DB_PASSWORD).
 
 5. **Generate Application Key:**
    ```bash
