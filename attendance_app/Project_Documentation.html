@@ -1,0 +1,101 @@
+<h1>Laravel Attendance System: Project Documentation</h1>
+<p>This document explains every file that was created or modified during the development of your Laravel Module Completion Project, why it exists, what it does, and how to use it.</p>
+<h2>1. Database Migrations &amp; Seeders (The Blueprint)</h2>
+<p>Migrations are version control for your database. Seeders allow you to automatically generate fake data for presentations.</p>
+<ul>
+<li><strong>File:</strong> <code>database/migrations/0001_01_01_000000_create_users_table.php</code><ul>
+<li><strong>What it does:</strong> Creates the <code>users</code> table where student and admin accounts are stored.</li>
+<li><strong>Why it was changed:</strong> Added a <code>$table-&gt;string(&#39;role&#39;)-&gt;default(&#39;student&#39;);</code> line so the system distinguishes between normal students and administrators.</li>
+</ul>
+</li>
+<li><strong>File:</strong> <code>database/migrations/..._create_attendances_table.php</code><ul>
+<li><strong>What it does:</strong> Creates the <code>attendances</code> table.</li>
+<li><strong>Why it was created:</strong> Stores the core data: <code>user_id</code>, <code>date</code>, <code>clock_in_time</code>, <code>clock_out_time</code>, and <code>status</code> (present, absent, leave).</li>
+</ul>
+</li>
+<li><strong>File:</strong> <code>database/seeders/DatabaseSeeder.php</code><ul>
+<li><strong>What it does:</strong> Automatically generates 1 master admin, 25 fake students, and 7 days of attendance history for demonstration purposes.</li>
+</ul>
+</li>
+</ul>
+<h2>2. Eloquent Models (The Data Layer)</h2>
+<p>Models are how Laravel interacts with the database tables.</p>
+<ul>
+<li><strong>File:</strong> <code>app/Models/User.php</code><ul>
+<li><strong>Why it was changed:</strong> Added <code>role</code> to <code>$fillable</code> and defined an <code>attendances()</code> function to create a &quot;One-to-Many&quot; relationship (One User has Many Attendances).</li>
+</ul>
+</li>
+<li><strong>File:</strong> <code>app/Models/Attendance.php</code><ul>
+<li><strong>Why it was created:</strong> Defines the <code>$fillable</code> fields allowed to be saved (like <code>clock_in_time</code>, <code>status</code>) and defines a <code>user()</code> relationship pointing back to the student.</li>
+</ul>
+</li>
+</ul>
+<h2>3. Controllers (The Brains)</h2>
+<p>Controllers contain the &quot;Business Logic&quot;.</p>
+<ul>
+<li><strong>File:</strong> <code>app/Http/Controllers/AttendanceController.php</code><ul>
+<li><strong>What it does:</strong> Handles logic for students clocking in/out and applying for leave.</li>
+<li><strong>Functions inside:</strong><ul>
+<li><code>clockIn()</code>, <code>clockOut()</code>: Validates and records timestamps.</li>
+<li><code>markLeave()</code>: Lets students apply for leave if they haven&#39;t clocked in yet.</li>
+<li><code>adminIndex()</code>: Displays the admin attendance view, including logic for <strong>Statistics Generation</strong>, <strong>Date Filtering</strong>, and <strong>Pagination</strong>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>File:</strong> <code>app/Http/Controllers/AdminStudentController.php</code><ul>
+<li><strong>What it does:</strong> Provides a full <strong>CRUD</strong> (Create, Read, Update, Delete) system for Administrators to manage student accounts.</li>
+<li><strong>Functions inside:</strong><ul>
+<li>Standard resource methods: <code>index</code>, <code>create</code>, <code>store</code>, <code>edit</code>, <code>update</code>, <code>destroy</code>.</li>
+<li><code>markAbsent()</code>: Allows the admin to mark a student absent for the day.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2>4. Routes (The Map)</h2>
+<p>Routes tell Laravel which Controller function to run for specific URLs.</p>
+<ul>
+<li><strong>File:</strong> <code>routes/web.php</code><ul>
+<li><strong>Why it was changed:</strong> Added routes for the Dashboard, Clock In/Out/Leave forms, and a <code>Route::resource</code> for Admin Student Management. All wrapped in <code>auth</code> middleware.</li>
+</ul>
+</li>
+<li><strong>File:</strong> <code>routes/auth.php</code><ul>
+<li><strong>Why it was changed:</strong> Public registration (<code>/register</code>) was completely deleted for security. Only Admins can create student accounts now.</li>
+</ul>
+</li>
+</ul>
+<h2>5. Views (The User Interface)</h2>
+<p>Views use the Blade templating engine and Tailwind CSS.</p>
+<ul>
+<li><strong>File:</strong> <code>resources/views/dashboard.blade.php</code><ul>
+<li><strong>What it does:</strong> The main page students see. Contains functional Clock In, Clock Out, and Request Leave buttons, plus a history table.</li>
+</ul>
+</li>
+<li><strong>File:</strong> <code>resources/views/admin/attendances.blade.php</code><ul>
+<li><strong>What it does:</strong> The Admin Panel. Contains dynamic Statistics cards, a Date Filter form, and a paginated table of all daily attendances.</li>
+</ul>
+</li>
+<li><strong>File:</strong> <code>resources/views/admin/students/index.blade.php</code>, <code>create.blade.php</code>, <code>edit.blade.php</code><ul>
+<li><strong>What they do:</strong> The interfaces for the Admin to view all students, add new ones, and update/delete existing ones.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>How to Present &amp; Test the Application</h2>
+<ol>
+<li><strong>Reset &amp; Seed Data:</strong> Open your terminal in the project folder and run <code>php artisan migrate:fresh --seed</code>. This builds the database and fills it with fake students and attendances.</li>
+<li><strong>Start the Server:</strong> Run <code>php artisan serve</code>. Go to <code>http://localhost:8000</code> in your web browser.</li>
+<li><strong>Test Admin Role:</strong> <ul>
+<li>Log in with Email: <code>admin@admin.com</code> | Password: <code>password123</code></li>
+<li>Look at the Top Navigation bar. You will see <strong>Attendances (Admin)</strong> and <strong>Students (Admin)</strong>.</li>
+<li>Test adding a student, filtering by date, and viewing the statistics.</li>
+</ul>
+</li>
+<li><strong>Test Student Role:</strong><ul>
+<li>Log out and log back in using the credentials of a student you created.</li>
+<li>Test clicking &quot;Clock In&quot;, &quot;Clock Out&quot;, or &quot;Request Leave&quot;.</li>
+</ul>
+</li>
+</ol>
+
